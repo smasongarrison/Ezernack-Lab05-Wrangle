@@ -48,14 +48,52 @@ We are looking of 6 pairings of Dennys x La Quinta locations so I will need to c
 
 ### Exercise 4
 
-...
+```{r joindata}
+
+dn_lq_ak <- full_join(dn_ak, lq_ak,
+  by = "state"
+)
+dn_lq_ak
+
+```
+
+There are 12 observations in the joined data frame. 
 
 ### Exercise 5
 
-...
+We will use the mutate() function to add a new variable into the data frame while keeping the existing variables. 
+
 
 ### Exercise 6
+```{r calculatedistance}
+haversine <- function(longitude.x, latitude.x, longitude.y, latitude.y, round = 3) {
+  
 
-...
+  # convert to radians
+  long1 <- longitude.x * pi / 180
+  lat1 <- latitude.x * pi / 180
+  long2 <- longitude.y * pi / 180
+  lat2 <- latitude.y * pi / 180
 
-Add exercise headings as needed.
+  R <- 6371 # Earth mean radius in km
+
+  a <- sin((lat2 - long1) / 2)^2 + cos(lat1) * cos(lat2) * sin((long2 - long1) / 2)^2
+  d <- R * 2 * asin(sqrt(a))
+
+  return(round(d, round)) # distance in km
+  
+} 
+dn_lq_ak <- dn_lq_ak %>% mutate(distance = haversine(longitude.x, latitude.x, longitude.y, latitude.y))
+```
+
+### Exercise 7
+
+```{r mindennys}
+dn_lq_ak <- dn_lq_ak %>% group_by(address.x) %>% mutate(mindistance = min(distance, na.rm = TRUE))
+
+```
+
+### Exercise 8
+```{r mindennys}
+ dn_lq_ak %>% ggplot(aes(x=mindistance)) + geom_bar()
+```
